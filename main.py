@@ -7,17 +7,17 @@ from person import Person
 
 
 class PeopleApp(tk.Tk):
+
     def __init__(self):
         super().__init__()
         self.title("People Manager")
-        self.geometry("850x400")  # Увеличиваем размер окна для удобного отображения таблицы
+        self.geometry("750x400+0+0")
         self.data_manager = DataManager()
 
         # Создание фрейма для кнопок меню в верхней части окна
         button_frame = tk.Frame(self)
         button_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
 
-        # Перераспределение кнопок в требуемом порядке
         tk.Button(button_frame, text="Загрузить данные из файла", command=self.load_data).pack(side=tk.LEFT, padx=5)
         tk.Button(button_frame, text="Сохранить данные в файл", command=self.save_data).pack(side=tk.LEFT, padx=5)
         tk.Button(button_frame, text="Добавить нового человека", command=self.add_person).pack(side=tk.LEFT, padx=5)
@@ -28,7 +28,7 @@ class PeopleApp(tk.Tk):
 
         # Поле для ввода поискового запроса
         self.search_entry = tk.Entry(button_frame)
-        self.search_entry.pack(side=tk.RIGHT, padx=5)
+        self.search_entry.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=5)
 
         # tk.Button(button_frame, text="Выход", command=self.quit).pack(side=tk.LEFT, padx=5)
 
@@ -51,7 +51,7 @@ class PeopleApp(tk.Tk):
         # Определение ширины столбцов
         self.tree.column("ФИО", width=200)
         self.tree.column("Дата рождения", width=100)
-        self.tree.column("Дата смерти", width=150)  # Увеличил ширину для корректного отображения
+        self.tree.column("Дата смерти", width=150)
         self.tree.column("Полных лет", width=80)
         self.tree.column("Пол", width=80)
 
@@ -67,11 +67,11 @@ class PeopleApp(tk.Tk):
         """Парсинг даты и преобразование её в формат YYYY-MM-DD."""
         try:
             parsed_date = parser.parse(date_str,
-                                       dayfirst=True)  # Используем dayfirst=True, чтобы правильно обрабатывать форматы с первым днем
-            return parsed_date.strftime("%Y-%m-%d")
+                                       dayfirst=True)  # Используем dayfirst=True, чтобы правильно обрабатывать форматы с первым днем, возвращ объект datetime
+            return parsed_date.strftime("%Y-%m-%d") #преобразовует datetime в строку
         except ValueError:
             raise ValueError(
-                "Некорректный формат даты. Используйте форматы: 'DD.MM.YYYY', 'DD MM YYYY', 'MM/DD/YYYY', 'D-M-YYYY' и т.п.")
+                "Некорректный формат даты. Используйте форматы: 'DD.MM.YYYY', 'DD MM YYYY', 'DD/MM/YYYY', 'D-M-YYYY' и т.п.")
 
     def format_date(self, date_str):
         """Преобразование даты из формата YYYY-MM-DD в формат DD.MM.YYYY."""
@@ -91,6 +91,7 @@ class PeopleApp(tk.Tk):
         else:
             for person in persons:
                 fio = f"{person.first_name} {person.middle_name or ''} {person.last_name or ''}".strip()
+                # fio = person.__str__()
                 birth_date = self.format_date(person.birth_date)
 
                 if person.death_date:
@@ -115,9 +116,9 @@ class PeopleApp(tk.Tk):
         last_name = simpledialog.askstring("Фамилия", "Введите фамилию (необязательно):")
         middle_name = simpledialog.askstring("Отчество", "Введите отчество (необязательно):")
         birth_date_str = simpledialog.askstring("Дата рождения",
-                                                "Введите дату рождения (DD.MM.YYYY, DD MM YYYY, MM/DD/YYYY, D-M-YYYY):")
+                                                "Введите дату рождения (DD.MM.YYYY, DD MM YYYY, DD/MM/YYYY, D-M-YYYY):")
         death_date_str = simpledialog.askstring("Дата смерти",
-                                                "Введите дату смерти (если есть, DD.MM.YYYY, DD MM YYYY, MM/DD/YYYY, D-M-YYYY):")
+                                                "Введите дату смерти (если есть, DD.MM.YYYY, DD MM YYYY, DD/MM/YYYY, D-M-YYYY):")
 
         # Выпадающий список для выбора пола
         gender = self.select_gender()
@@ -187,8 +188,8 @@ class PeopleApp(tk.Tk):
 
     def save_data(self):
         """Сохранение данных в файл."""
-        file_name = filedialog.asksaveasfilename(title="Сохранить файл", defaultextension=".json",
-                                                 filetypes=[("JSON files", "*.json")])
+        file_name = filedialog.asksaveasfilename(title="Сохранить файл", defaultextension=".json",#filedialog из tkinter
+                                                 filetypes=[("JSON files", "*.json")])#в file_name записана строка с полным путем к файлу
         if file_name:
             self.data_manager.save_to_file(file_name)
             messagebox.showinfo("Успех", "Данные успешно сохранены!")
@@ -197,7 +198,4 @@ class PeopleApp(tk.Tk):
 if __name__ == "__main__":
     app = PeopleApp()
     app.mainloop()
-
-
-
 
